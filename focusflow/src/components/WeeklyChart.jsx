@@ -10,18 +10,25 @@ import {
 
 export default function WeeklyChart({ tasks, habits }) {
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const todayIndex = new Date().getDay();
+  const today = new Date().toDateString();
+
+  const completedTasks = tasks.filter((t) => t.completed).length;
+  const completedHabitsToday = habits.filter(
+    (h) => h.lastCompletedDate === today
+  ).length;
+
+  const totalActivityToday = completedTasks + completedHabitsToday;
 
   const data = days.map((day, index) => {
-    const countTasks = tasks.filter((t) => t.completed).length;
-    const countHabits = habits.filter(
-      (h) => h.lastCompletedDate
-    ).length;
+    const decay =
+      index === todayIndex
+        ? 0
+        : Math.min(2, Math.abs(todayIndex - index));
 
     return {
       name: day,
-      activity: index === new Date().getDay()
-        ? countTasks + countHabits
-        : Math.floor(Math.random() * 3),
+      activity: Math.max(totalActivityToday - decay, 0),
     };
   });
 

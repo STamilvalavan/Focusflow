@@ -7,7 +7,7 @@ export default function ParticleBackground({ theme }) {
     await loadFull(engine);
   }, []);
 
-  const particleColor = theme === "neon" ? "#a855f7" : "#22d3ee";
+  const particleColor = theme === "light" ? "#a855f7" : "#22d3ee";
 
   return (
     <Particles

@@ -10,7 +10,10 @@ import ParticleBackground from "../components/ParticleBackground";
 
 export default function Dashboard() {
   const [activePage, setActivePage] = useState("dashboard");
-  const [theme, setTheme] = useState("dark");
+  const [theme, setTheme] = useState(() => {
+    const stored = localStorage.getItem("theme");
+    return stored === "light" || stored === "dark" ? stored : "dark";
+  });
 
   const [taskInput, setTaskInput] = useState("");
   const [habitInput, setHabitInput] = useState("");
@@ -111,6 +114,10 @@ export default function Dashboard() {
     setHabits(prev => prev.filter(habit => habit.id !== id));
   };
 
+  useEffect(() => {
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
   // ================= ANALYTICS =================
   const totalItems = tasks.length + habits.length;
   const completedTasks = tasks.filter(t => t.completed).length;
@@ -130,7 +137,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen flex text-white">
+    <div className="min-h-screen w-full flex text-white">
       <ParticleBackground theme={theme} />
 
       <Sidebar
@@ -141,7 +148,7 @@ export default function Dashboard() {
       <div className="flex-1 flex justify-center 
                       bg-gradient-to-br 
                       from-slate-950 via-slate-900 to-black 
-                      p-8">
+                      px-4 py-6 md:px-8 md:py-10">
 
         <div className="w-full max-w-6xl space-y-10">
 
@@ -284,7 +291,7 @@ export default function Dashboard() {
                     <span>Theme Mode</span>
                     <button
                       onClick={() =>
-                        setTheme(theme === "dark" ? "neon" : "dark")
+                        setTheme(theme === "dark" ? "light" : "dark")
                       }
                       className="bg-purple-500 px-4 py-2 rounded-lg"
                     >
