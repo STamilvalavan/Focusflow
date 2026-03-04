@@ -37,19 +37,25 @@ export default function WeeklyChart({ tasks, habits }) {
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="bg-slate-800/60 backdrop-blur-md 
-                 border border-slate-700 
+      className="bg-[color:var(--ff-card)] backdrop-blur-md 
+                 border border-[color:var(--ff-border)] 
                  p-6 rounded-2xl shadow-xl"
     >
-      <h2 className="text-xl font-semibold mb-4">
+      <h2 className="text-xl font-semibold mb-4 text-[color:var(--ff-text)]">
         📊 Weekly Activity
       </h2>
 
       <ResponsiveContainer width="100%" height={250}>
         <BarChart data={data}>
-          <XAxis dataKey="name" stroke="#94a3b8" />
-          <YAxis stroke="#94a3b8" />
-          <Tooltip />
+          <XAxis dataKey="name" stroke="var(--ff-muted)" />
+          <YAxis stroke="var(--ff-muted)" />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: "var(--ff-card-strong)",
+              borderColor: "var(--ff-border)",
+              borderRadius: 12,
+            }}
+          />
           <Bar
             dataKey="activity"
             fill="#a855f7"

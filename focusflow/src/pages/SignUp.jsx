@@ -1,13 +1,17 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
 
 export default function SignUp() {
   const navigate = useNavigate();
+  const { signup } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [dob, setDob] = useState("");
   const [errors, setErrors] = useState({});
+  const [submitError, setSubmitError] = useState("");
 
   const validate = () => {
     const nextErrors = {};
@@ -28,16 +32,25 @@ export default function SignUp() {
       nextErrors.password = "Password must be at least 6 characters.";
     }
 
+    if (!dob) {
+      nextErrors.dob = "Date of birth is required.";
+    }
+
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setSubmitError("");
     if (!validate()) return;
 
-    // Placeholder registration success – route into app
-    navigate("/");
+    try {
+      signup({ name, email, password, dob });
+      navigate("/");
+    } catch (err) {
+      setSubmitError(err.message || "Unable to create account.");
+    }
   };
 
   return (
@@ -46,7 +59,7 @@ export default function SignUp() {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="w-full max-w-md bg-slate-900/80 border border-slate-700/70 rounded-3xl shadow-2xl backdrop-blur-xl p-8 md:p-10 space-y-6"
+        className="w-full max-w-md bg-[color:var(--ff-card)] border border-[color:var(--ff-border)] rounded-3xl shadow-2xl backdrop-blur-xl p-8 md:p-10 space-y-6"
       >
         <div className="text-center space-y-3">
           <motion.h1
@@ -57,7 +70,7 @@ export default function SignUp() {
           >
             Create your Flow
           </motion.h1>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-[color:var(--ff-muted)]">
             Sign up to track tasks, habits, and deep work sessions.
           </p>
         </div>
@@ -71,7 +84,7 @@ export default function SignUp() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-xl bg-slate-900/70 border border-slate-700 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/80 focus:border-transparent placeholder:text-slate-500"
+              className="w-full rounded-xl bg-slate-900/70 border border-slate-700 hover:border-slate-500 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/80 focus:border-transparent placeholder:text-slate-500 transition-colors"
               placeholder="Alex Focus"
             />
             {errors.name && (
@@ -87,7 +100,7 @@ export default function SignUp() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl bg-slate-900/70 border border-slate-700 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/80 focus:border-transparent placeholder:text-slate-500"
+              className="w-full rounded-xl bg-slate-900/70 border border-slate-700 hover:border-slate-500 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/80 focus:border-transparent placeholder:text-slate-500 transition-colors"
               placeholder="you@example.com"
             />
             {errors.email && (
@@ -103,7 +116,7 @@ export default function SignUp() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-xl bg-slate-900/70 border border-slate-700 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/80 focus:border-transparent placeholder:text-slate-500"
+              className="w-full rounded-xl bg-slate-900/70 border border-slate-700 hover:border-slate-500 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/80 focus:border-transparent placeholder:text-slate-500 transition-colors"
               placeholder="••••••••"
             />
             {errors.password && (
@@ -111,15 +124,34 @@ export default function SignUp() {
             )}
           </div>
 
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium text-slate-200">
+              Date of Birth
+            </label>
+            <input
+              type="date"
+              value={dob}
+              onChange={(e) => setDob(e.target.value)}
+              className="w-full rounded-xl bg-slate-900/70 border border-slate-700 hover:border-slate-500 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/80 focus:border-transparent placeholder:text-slate-500 transition-colors"
+            />
+            {errors.dob && (
+              <p className="text-xs text-red-400 mt-0.5">{errors.dob}</p>
+            )}
+          </div>
+
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             type="submit"
-            className="w-full mt-2 rounded-xl bg-gradient-to-r from-purple-500 via-sky-500 to-emerald-400 text-slate-950 font-semibold py-2.5 text-sm shadow-lg shadow-purple-500/30"
+            className="w-full mt-2 rounded-xl bg-gradient-to-r from-purple-500 via-sky-500 to-emerald-400 text-slate-950 font-semibold py-2.5 text-sm shadow-lg shadow-purple-500/30 hover:brightness-110 transition"
           >
-            Create Account
+            Create account
           </motion.button>
         </form>
+
+        {submitError && (
+          <p className="text-xs text-red-400 text-center">{submitError}</p>
+        )}
 
         <div className="text-center text-xs text-slate-400">
           <span>Already have an account? </span>

@@ -7,6 +7,56 @@ body {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  background-color: #020617;
-  color: #e5e7eb;
+  background: var(--ff-page-bg);
+  color: var(--ff-text);
+}
+
+:root {
+  --ff-page-bg: #020617;
+  --ff-app-gradient: radial-gradient(
+      1200px circle at 20% 0%,
+      rgba(168, 85, 247, 0.18),
+      transparent 55%
+    ),
+    radial-gradient(
+      900px circle at 80% 15%,
+      rgba(34, 211, 238, 0.14),
+      transparent 55%
+    ),
+    linear-gradient(135deg, #020617, #0b1220 45%, #000000);
+
+  --ff-text: #e5e7eb;
+  --ff-muted: #94a3b8;
+
+  --ff-card: rgba(15, 23, 42, 0.72);
+  --ff-card-strong: rgba(15, 23, 42, 0.9);
+  --ff-border: rgba(148, 163, 184, 0.22);
+
+  --ff-input-bg: rgba(15, 23, 42, 0.82);
+  --ff-sidebar-bg: rgba(255, 255, 255, 0.06);
+}
+
+html[data-theme="light"] {
+  --ff-page-bg: #f8fafc;
+  --ff-app-gradient: radial-gradient(
+      1200px circle at 20% 0%,
+      rgba(168, 85, 247, 0.14),
+      transparent 55%
+    ),
+    radial-gradient(
+      900px circle at 80% 15%,
+      rgba(34, 211, 238, 0.12),
+      transparent 55%
+    ),
+    linear-gradient(135deg, #ffffff, #f1f5f9 55%, #e2e8f0);
+
+  --ff-text: #0f172a;
+  --ff-muted: #475569;
+
+  --ff-card: rgba(255, 255, 255, 0.78);
+  --ff-card-strong: rgba(255, 255, 255, 0.92);
+  --ff-border: rgba(15, 23, 42, 0.12);
+
+  --ff-input-bg: rgba(255, 255, 255, 0.92);
+  --ff-sidebar-bg: rgba(15, 23, 42, 0.04);
 }

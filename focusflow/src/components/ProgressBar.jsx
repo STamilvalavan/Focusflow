@@ -1,9 +1,19 @@
+import { motion } from "framer-motion";
+
 export default function ProgressBar({ progress }) {
   return (
-    <div className="bg-slate-800 p-4 rounded-2xl shadow-lg">
+    <div className="p-1">
       <div className="flex justify-between mb-2">
-        <span>Daily Progress</span>
-        <span>{progress}%</span>
+        <span className="text-sm text-slate-300">Daily progress</span>
+        <motion.span
+          key={progress}
+          initial={{ scale: 0.9, opacity: 0.8 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 260, damping: 20 }}
+          className="text-sm font-semibold text-slate-100"
+        >
+          {progress}%
+        </motion.span>
       </div>
 
       <div className="w-full bg-slate-700 h-3 rounded-full">

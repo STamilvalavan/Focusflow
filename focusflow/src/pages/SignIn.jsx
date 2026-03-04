@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
 
 export default function SignIn() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
+  const [submitError, setSubmitError] = useState("");
 
   const validate = () => {
     const nextErrors = {};
@@ -28,10 +31,15 @@ export default function SignIn() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setSubmitError("");
     if (!validate()) return;
 
-    // Placeholder auth success – route into app
-    navigate("/");
+    try {
+      login({ email, password });
+      navigate("/");
+    } catch (err) {
+      setSubmitError(err.message || "Unable to sign in.");
+    }
   };
 
   return (
@@ -40,7 +48,7 @@ export default function SignIn() {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="w-full max-w-md bg-slate-900/80 border border-slate-700/70 rounded-3xl shadow-2xl backdrop-blur-xl p-8 md:p-10 space-y-6"
+        className="w-full max-w-md bg-[color:var(--ff-card)] border border-[color:var(--ff-border)] rounded-3xl shadow-2xl backdrop-blur-xl p-8 md:p-10 space-y-6"
       >
         <div className="text-center space-y-3">
           <motion.h1
@@ -51,7 +59,7 @@ export default function SignIn() {
           >
             Welcome back
           </motion.h1>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-[color:var(--ff-muted)]">
             Sign in to continue your focus and habit streaks.
           </p>
         </div>
@@ -65,7 +73,7 @@ export default function SignIn() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl bg-slate-900/70 border border-slate-700 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/80 focus:border-transparent placeholder:text-slate-500"
+              className="w-full rounded-xl bg-slate-900/70 border border-slate-700 hover:border-slate-500 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/80 focus:border-transparent placeholder:text-slate-500 transition-colors"
               placeholder="you@example.com"
             />
             {errors.email && (
@@ -81,7 +89,7 @@ export default function SignIn() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-xl bg-slate-900/70 border border-slate-700 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/80 focus:border-transparent placeholder:text-slate-500"
+              className="w-full rounded-xl bg-slate-900/70 border border-slate-700 hover:border-slate-500 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/80 focus:border-transparent placeholder:text-slate-500 transition-colors"
               placeholder="••••••••"
             />
             {errors.password && (
@@ -93,11 +101,15 @@ export default function SignIn() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             type="submit"
-            className="w-full mt-2 rounded-xl bg-gradient-to-r from-purple-500 via-sky-500 to-emerald-400 text-slate-950 font-semibold py-2.5 text-sm shadow-lg shadow-purple-500/30"
+            className="w-full mt-2 rounded-xl bg-gradient-to-r from-purple-500 via-sky-500 to-emerald-400 text-slate-950 font-semibold py-2.5 text-sm shadow-lg shadow-purple-500/30 hover:brightness-110 transition"
           >
-            Sign In
+            Sign in
           </motion.button>
         </form>
+
+        {submitError && (
+          <p className="text-xs text-red-400 text-center">{submitError}</p>
+        )}
 
         <div className="text-center text-xs text-slate-400">
           <span>Don&apos;t have an account? </span>
