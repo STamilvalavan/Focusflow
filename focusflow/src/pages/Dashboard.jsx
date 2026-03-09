@@ -25,8 +25,17 @@ export default function Dashboard() {
   const [habitInput, setHabitInput] = useState("");
   const [habitFrequency, setHabitFrequency] = useState("daily");
 
-  const [tasks, setTasks] = useState([]);
-  const [habits, setHabits] = useState([]);
+  const [tasks, setTasks] = useState(() => {
+    if (!currentUserId) return [];
+    const saved = localStorage.getItem(`tasks_${currentUserId}`);
+    return saved ? JSON.parse(saved) : [];
+  });
+  
+  const [habits, setHabits] = useState(() => {
+    if (!currentUserId) return [];
+    const saved = localStorage.getItem(`habits_${currentUserId}`);
+    return saved ? JSON.parse(saved) : [];
+  });
   const [now, setNow] = useState(() => new Date());
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -38,25 +47,27 @@ export default function Dashboard() {
   const [profileMessage, setProfileMessage] = useState("");
 
   // Load per-user data when user changes
-  useEffect(() => {
-    if (!currentUserId) {
-      setTasks([]);
-      setHabits([]);
-      return;
-    }
-    const tasksKey = `tasks_${currentUserId}`;
-    const habitsKey = `habits_${currentUserId}`;
-
-    try {
-      const savedTasks = localStorage.getItem(tasksKey);
-      const savedHabits = localStorage.getItem(habitsKey);
-      setTasks(savedTasks ? JSON.parse(savedTasks) : []);
-      setHabits(savedHabits ? JSON.parse(savedHabits) : []);
-    } catch {
-      setTasks([]);
-      setHabits([]);
-    }
-  }, [currentUserId]);
+  // useEffect(() => {
+  //   if (!currentUserId) return;
+  
+  //   const tasksKey = `tasks_${currentUserId}`;
+  //   const habitsKey = `habits_${currentUserId}`;
+  
+  //   try {
+  //     const savedTasks = localStorage.getItem(tasksKey);
+  //     const savedHabits = localStorage.getItem(habitsKey);
+  
+  //     if (savedTasks) {
+  //       setTasks(JSON.parse(savedTasks));
+  //     }
+  
+  //     if (savedHabits) {
+  //       setHabits(JSON.parse(savedHabits));
+  //     }
+  //   } catch (err) {
+  //     console.error("Failed to load user data", err);
+  //   }
+  // }, [currentUserId]);
 
   // Persist per-user data
   useEffect(() => {
@@ -102,9 +113,8 @@ export default function Dashboard() {
         priority: taskPriority,
         dueDate: taskDueDate || null,
         tags: taskTags
-          .split(",")
-          .map((t) => t.trim())
-          .filter(Boolean),
+        ? taskTags.split(",").map(t => t.trim()).filter(Boolean)
+        : [],
       }
     ]);
     setTaskInput("");
@@ -144,7 +154,10 @@ export default function Dashboard() {
   };
 
   const toggleHabit = (id) => {
-    const today = new Date().toDateString();
+    const today = now.toDateString();
+    const completedHabits = habits.filter(
+      h => h.lastCompletedDate === today
+    ).length;
 
     setHabits(prev =>
       prev.map(habit => {
@@ -207,6 +220,12 @@ export default function Dashboard() {
     setHabits([]);
   };
 
+  const dateString = now.toLocaleDateString(undefined,{
+    weekday:"long",
+    month:"short",
+    day:"numeric"
+  });
+
   const timeString = now.toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
@@ -248,13 +267,13 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen w-full flex text-[color:var(--ff-text)]">
+    <div className="h-screen w-full flex overflow-hidden text-[color:var(--ff-text)]">
       <ParticleBackground theme={theme} />
 
       {/* Desktop sidebar */}
       <div className="hidden md:block">
         <Sidebar
-          activePage={activePage}
+          activePage={activePage} 
           setActivePage={setActivePage}
         />
       </div>
@@ -279,7 +298,7 @@ export default function Dashboard() {
       )}
 
       <div
-        className="flex-1 flex justify-center px-4 py-6 md:px-8 md:py-10"
+        className="flex-1 overflow-y-auto flex justify-center px-4 py-6 md:px-8 md:py-10"
         style={{ backgroundImage: "var(--ff-app-gradient)" }}
       >
 
@@ -306,7 +325,7 @@ export default function Dashboard() {
                   </button>
                 </div>
 
-                <div className="bg-[color:var(--ff-card)] backdrop-blur-md p-5 rounded-2xl border border-[color:var(--ff-border)] space-y-4">
+                <div className="bg-[color:var(--ff-card)] backdrop-blur-md p-6 rounded-2xl border border-[color:var(--ff-border)] max-h-[420px] overflow-y-auto">
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                   <div className="space-y-2 text-center md:text-left">
                     <h1 className="text-4xl font-bold 
@@ -329,6 +348,9 @@ export default function Dashboard() {
                   <div className="text-center md:text-right space-y-1">
                     <p className="text-xs uppercase tracking-wide text-[color:var(--ff-muted)]">
                       Current focus time
+                    </p>
+                      <p className="font-mono text-lg text-[color:var(--ff-text)]">
+                      {dateString}
                     </p>
                     <p className="font-mono text-lg text-[color:var(--ff-text)]">
                       {timeString}
@@ -538,11 +560,20 @@ export default function Dashboard() {
                     color="text-green-400"
                   />
                 </div>
+              {/* Empty state when there is no data */}
+              {totalItems === 0 && (
+              <p className="text-center text-sm text-[color:var(--ff-muted)] bg-[color:var(--ff-card)] border border-[color:var(--ff-border)] rounded-xl p-4">
+                📊 No analytics yet. Complete tasks or habits to see your productivity insights.
+              </p>
+              )}
 
+              {/* Show chart only if there is data */}
+              {totalItems > 0 && (
                 <WeeklyChart tasks={tasks} habits={habits} />
+              )}
               </motion.div>
             )}
-
+            
             {/* ================= SETTINGS PAGE ================= */}
             {activePage === "settings" && (
               <motion.div
